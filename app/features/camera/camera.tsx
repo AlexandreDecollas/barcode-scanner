@@ -1,8 +1,9 @@
-import React, {JSX, useState} from 'react'
+import React, {JSX, useRef, useState} from 'react'
 import {CameraType, CameraView, useCameraPermissions} from 'expo-camera';
 import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {AntDesign} from '@expo/vector-icons';
 import {useFocusEffect} from 'expo-router';
+import * as FileSystem from 'expo-file-system';
 
 interface IndexProps {
 
@@ -12,6 +13,7 @@ export default function Camera(props: IndexProps): JSX.Element {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
+  const cameraRef = useRef<CameraView>(null);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -44,13 +46,21 @@ export default function Camera(props: IndexProps): JSX.Element {
     );
   }
 
-  function takeAPicture() {
-    console.log('Take a picture');
+  async function takeAPicture() {
+    if (cameraRef.current) {
+	 const photo = await cameraRef.current.takePictureAsync();
+	 const fileUri = FileSystem.documentDirectory + 'photo.jpg';
+	 await FileSystem.moveAsync({
+	   from: photo!.uri,
+	   to: fileUri,
+	 });
+	 console.log('Photo saved to:', fileUri);
+    }
   }
 
   return (
     <View style={styles.container}>
-	 {isCameraActive && <CameraView style={styles.camera} facing={facing}>
+	 {isCameraActive && <CameraView ref={cameraRef}  style={styles.camera} facing={facing}>
 	   <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
 		<AntDesign name="retweet" size={24} color="white"
 				 style={styles.cameraFacingControl}/>
