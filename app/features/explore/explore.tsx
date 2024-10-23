@@ -11,13 +11,9 @@ export default function Explore(props: ExploreProps): JSX.Element {
   const [photos, setPhotos] = useState<string[]>([]);
 
 
-  useFocusEffect(
-    React.useCallback(() => {
-	 return () => {
-	 listPhotos();
-	 };
-    }, [])
-  );
+  useFocusEffect(() => {
+	 void listPhotos();
+  });
 
   async function listPhotos() {
     const photoDir = FileSystem.documentDirectory!;
