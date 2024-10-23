@@ -2,6 +2,7 @@ import React, {JSX, useState} from 'react'
 import {CameraType, CameraView, useCameraPermissions} from 'expo-camera';
 import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {AntDesign} from '@expo/vector-icons';
+import {useFocusEffect} from 'expo-router';
 
 interface IndexProps {
 
@@ -10,6 +11,19 @@ interface IndexProps {
 export default function Camera(props: IndexProps): JSX.Element {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
+  const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
+
+  useFocusEffect(
+    React.useCallback(() => {
+	 // Code to run when the screen is focused
+	 setIsCameraActive(true);
+
+	 return () => {
+	   // Code to run when the screen is unfocused (unmounted)
+	   setIsCameraActive(false);
+	 };
+    }, [])
+  );
 
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -36,7 +50,7 @@ export default function Camera(props: IndexProps): JSX.Element {
 
   return (
     <View style={styles.container}>
-	 <CameraView style={styles.camera} facing={facing}>
+	 {isCameraActive && <CameraView style={styles.camera} facing={facing}>
 	   <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
 		<AntDesign name="retweet" size={24} color="white"
 				 style={styles.cameraFacingControl}/>
@@ -44,10 +58,10 @@ export default function Camera(props: IndexProps): JSX.Element {
 	   <View style={styles.buttonContainer}>
 		<TouchableOpacity style={styles.button} onPress={takeAPicture}>
 		  <AntDesign name="scan1" size={24} color="white"
-				   style={styles.takeAPicture} />
+				   style={styles.takeAPicture}/>
 		</TouchableOpacity>
 	   </View>
-	 </CameraView>
+	 </CameraView>}
     </View>
   )
 }
