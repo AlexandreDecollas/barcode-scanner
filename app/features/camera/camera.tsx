@@ -1,6 +1,7 @@
 import React, {JSX, useState} from 'react'
 import {CameraType, CameraView, useCameraPermissions} from 'expo-camera';
 import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {AntDesign} from '@expo/vector-icons';
 
 interface IndexProps {
 
@@ -16,7 +17,7 @@ export default function Camera(props: IndexProps): JSX.Element {
 
   if (!permission) {
     // Camera permissions are still loading.
-    return <View />;
+    return <View/>;
   }
 
   if (!permission.granted) {
@@ -24,17 +25,26 @@ export default function Camera(props: IndexProps): JSX.Element {
     return (
 	 <View style={styles.container}>
 	   <Text style={styles.message}>We need your permission to show the camera</Text>
-	   <Button onPress={requestPermission} title="grant permission" />
+	   <Button onPress={requestPermission} title="grant permission"/>
 	 </View>
     );
+  }
+
+  function takeAPicture() {
+    console.log('Take a picture');
   }
 
   return (
     <View style={styles.container}>
 	 <CameraView style={styles.camera} facing={facing}>
+	   <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+		<AntDesign name="retweet" size={24} color="white"
+				 style={styles.cameraFacingControl}/>
+	   </TouchableOpacity>
 	   <View style={styles.buttonContainer}>
-		<TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-		  <Text style={styles.text}>Flip Camera</Text>
+		<TouchableOpacity style={styles.button} onPress={takeAPicture}>
+		  <AntDesign name="scan1" size={24} color="white"
+				   style={styles.takeAPicture} />
 		</TouchableOpacity>
 	   </View>
 	 </CameraView>
@@ -62,12 +72,20 @@ const styles = StyleSheet.create({
   button: {
     flex: 1,
     alignSelf: 'flex-end',
+    marginTop: 50,
     alignItems: 'center',
   },
   text: {
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
+  }, cameraFacingControl: {
+    marginRight: 30
   },
+  takeAPicture: {
+    alignSelf: 'center', // Center horizontally
+    alignItems: 'center', // Center content inside the button
+    justifyContent: 'center', // Center content inside the button
+  }
 });
 

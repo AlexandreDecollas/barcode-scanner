@@ -15,7 +15,7 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="take-a-photo"
+        name="index"
         options={{
           title: 'Take a photo',
           tabBarIcon: ({ color, focused }) => (
