@@ -5,7 +5,9 @@ import {AntDesign} from '@expo/vector-icons';
 import {useFocusEffect} from 'expo-router';
 import * as FileSystem from 'expo-file-system';
 
-interface IndexProps {}
+
+interface IndexProps {
+}
 
 export default function Camera(props: IndexProps): JSX.Element {
   const [facing, setFacing] = useState<CameraType>('back');
@@ -13,14 +15,15 @@ export default function Camera(props: IndexProps): JSX.Element {
   const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
   const [photos, setPhotos] = useState<string[]>([]);
   const cameraRef = useRef<CameraView>(null);
+  const [scannedUrl, setScannedUrl] = useState<string>('');
 
   useFocusEffect(
     React.useCallback(() => {
-      setIsCameraActive(true);
-      listPhotos();
-      return () => {
-        setIsCameraActive(false);
-      };
+	 setIsCameraActive(true);
+	 listPhotos();
+	 return () => {
+	   setIsCameraActive(false);
+	 };
     }, [])
   );
 
@@ -35,45 +38,76 @@ export default function Camera(props: IndexProps): JSX.Element {
   }
 
   if (!permission) {
-    return <View />;
+    return <View/>;
   }
 
   if (!permission.granted) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.message}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
+	 <View style={styles.container}>
+	   <Text style={styles.message}>We need your permission to show the camera</Text>
+	   <Button onPress={requestPermission} title="grant permission"/>
+	 </View>
     );
   }
 
   async function takeAPicture() {
+    console.log('Scanned URL:', scannedUrl);
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
-      const fileUri = FileSystem.documentDirectory + 'photo_' + Date.now() + '.jpg';
-      await FileSystem.moveAsync({
-        from: photo!.uri,
-        to: fileUri,
-      });
-      console.log('Photo saved to:', fileUri);
-      listPhotos(); // Update the list of photos
+	 const photo = await cameraRef.current.takePictureAsync();
+	 const fileUri = FileSystem.documentDirectory + 'photo_' + Date.now() + '_' + scannedUrl + '_' + '.jpg';
+	 await FileSystem.moveAsync({
+	   from: photo!.uri,
+	   to: fileUri,
+	 });
+	 console.log('Photo saved to:', fileUri);
+	 listPhotos();
     }
+    setScannedUrl('');
+  }
+
+  function handleBarCodeScanned({type, data}: { type: string; data: string }) {
+    setScannedUrl(data);
   }
 
   return (
     <View style={styles.container}>
-      {isCameraActive && (
-        <CameraView ref={cameraRef} style={styles.camera} facing={facing}>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <AntDesign name="retweet" size={24} color="white" style={styles.cameraFacingControl} />
-          </TouchableOpacity>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.button} onPress={takeAPicture}>
-              <AntDesign name="scan1" size={24} color="white" style={styles.takeAPicture} />
-            </TouchableOpacity>
-          </View>
-        </CameraView>
-      )}
+	 {isCameraActive && (
+	   <CameraView
+		ref={cameraRef}
+		style={styles.camera}
+		facing={facing}
+		onBarcodeScanned={handleBarCodeScanned}
+		barcodeScannerSettings={{
+		  barcodeTypes: ['code128', 'qr'],
+		}}
+	   >
+		<TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+		  <AntDesign name="retweet" size={24} color="white"
+				   style={styles.cameraFacingControl}/>
+		</TouchableOpacity>
+		<View style={styles.buttonContainer}>
+		  <TouchableOpacity style={styles.button} onPress={takeAPicture}>
+		    <AntDesign name="scan1" size={24} color="white"
+					style={styles.takeAPicture}
+					onPress={scannedUrl ? takeAPicture : undefined}/>
+
+		    {scannedUrl &&
+                  <TouchableOpacity style={styles.scanButton}>
+                      <View style={styles.buttonContent}>
+                          <Text
+                              style={styles.buttonText}>{`Validate ${scannedUrl}`}</Text>
+                      </View>
+                  </TouchableOpacity>}
+
+		    {!scannedUrl && (<>
+			   <Text style={styles.takeAPictureText}>Waiting to detect a code...</Text>
+			 </>
+
+		    )}
+		  </TouchableOpacity>
+		</View>
+	   </CameraView>
+	 )}
     </View>
   );
 }
@@ -102,11 +136,6 @@ const styles = StyleSheet.create({
     marginTop: 50,
     alignItems: 'center',
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
   cameraFacingControl: {
     marginRight: 30,
   },
@@ -115,10 +144,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  photoItem: {
+  takeAPictureText: {
+    color: 'white',
+    fontSize: 18,
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  scanButton: {
     color: 'white',
     padding: 10,
-    fontSize: 18,
-    height: 44,
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    paddingLeft: 5,
+    fontSize: 16,
+    marginRight: 8,
+  },
+  icon: {
+    color: 'white',
   },
 });
