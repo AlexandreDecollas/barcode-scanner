@@ -18,3 +18,31 @@ web-build/
 
 expo-env.d.ts
 # @end expo-cli
+/.idea/.gitignore
+/.idea/modules.xml
+/.idea/my-app.iml
+/.idea/prettier.xml
+/.idea/vcs.xml
+/ios/myapp/Images.xcassets/AppIcon.appiconset/App-Icon-1024x1024@1x.png
+/ios/myapp/Images.xcassets/AppIcon.appiconset/Contents.json
+/ios/myapp/Images.xcassets/SplashScreen.imageset/Contents.json
+/ios/myapp/Images.xcassets/SplashScreen.imageset/image.png
+/ios/myapp/Images.xcassets/SplashScreenBackground.imageset/Contents.json
+/ios/myapp/Images.xcassets/SplashScreenBackground.imageset/image.png
+/ios/myapp/Images.xcassets/Contents.json
+/ios/myapp/Supporting/Expo.plist
+/ios/myapp/AppDelegate.h
+/ios/myapp/AppDelegate.mm
+/ios/myapp/Info.plist
+/ios/myapp/main.m
+/ios/myapp/myapp.entitlements
+/ios/myapp/myapp-Bridging-Header.h
+/ios/myapp/noop-file.swift
+/ios/myapp/SplashScreen.storyboard
+/ios/myapp.xcodeproj/xcshareddata/xcschemes/myapp.xcscheme
+/ios/myapp.xcodeproj/project.pbxproj
+/ios/.gitignore
+/ios/.xcode.env
+/ios/Podfile
+/ios/Podfile.properties.json
+/yarn.lock
